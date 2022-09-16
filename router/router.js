@@ -20,57 +20,64 @@ const transport = nodemailer.createTransport({
 });
 
 router.post("/prices/btc", async (request, response) => {
-  const { date, offset, limit } = request.query;
-  const { max, min,email } = request.body;
-  
-  console.log(date, offset, limit,max, min,email);
-  let curr_val;
+  let { date, page, limit } = request.query;
+  const { max, min, email } = request.body;
 
-  setInterval(() => {
+  let fetchdata;
+
+  clearInterval(fetchdata);
+
+  fetchdata = setInterval(() => {
     axios
       .get(
-        `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${date}`
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin`
       )
-      .then(async({ data }) => {
-        // console.log(data);0
-        curr_val = data.market_data.current_price.usd;
-        const price = new Modal({price:curr_val, coin:"btc"})
-        await price.save()
-
+      .then(({ data }) => {
+        let curr_val = data[0].current_price;
+        const price = new Modal({ price: curr_val, coin: "btc", email });
+        price.save();
+        sendreq(curr_val);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+      });
   }, 10 * 1000);
 
-  const content = `<div>
+  const sendreq = (val) => {
+    console.log("functioncall");
+    const content = `<div>
     <h3>Hey there, {{Email}} </h3>
     <p>The price value of Bitcoin(BTC) in USD goes {{up_down}} by {{diff}}</p>
     <p>Current value: {{current}}</p>
   </div>`;
-  const template = hbs.compile(content);
+    const template = hbs.compile(content);
+    if (val > max) {
+      console.log(val, email);
+      transport.sendMail({
+        from: "aliguddu63@gmail.com",
+        to: email,
+        subject: "Bitcoin price update",
+        html: template({ Email: email, up_down: "Up", diff: val - max }),
+      });
+    } else if (val < min) {
+      // console.log(val, min);
+      transport.sendMail({
+        from: "aliguddu63@gmail.com",
+        to: email,
+        subject: "Bitcoin price update",
+        html: template({ Email: email, up_down: "down", diff: min - val }),
+      });
+    }
+  };
 
-  if (4000 > max) {
-    transport.sendMail({
-      from: "example.mailtrap.io",
-      to: email,
-      subject: "Bitcoin price update",
-      html: template({ Email: email, up_down: "Up", diff: curr_val - max }),
-    });
-  } else if (curr_val < min) {
-    transport.sendMail({
-      from: "example.mailtrap.io",
-      to: email,
-      subject: "Bitcoin price update",
-      html: template({ Email: email, up_down: "down", diff: min - curr_val }),
-    });
+  if (page == undefined) {
+    page = 1;
   }
 
-  if(offset==undefined){
-    offset=0
-  }
-
-  let data = await Modal.find().skip(offset).limit(offset+limit)
-  response.status(200).send(data)
+  let data = await Modal.find({ email })
+    .skip((page - 1) * limit)
+    .limit(page * limit);
+  response.status(200).send({ data, count: data.length });
 });
-
 
 module.exports = router;

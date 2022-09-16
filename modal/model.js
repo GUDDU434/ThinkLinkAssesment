@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const cryptoPrice = new Schema(
   {
+    email:String,
     price: Number,
     coin: String,
   },
