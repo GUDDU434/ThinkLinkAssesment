@@ -1,10 +1,13 @@
-const { Schema } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
-const cryptoPrice = new Schema({
-  price:Number,
-  coin:String
-},{timestamps:true});
+const cryptoPrice = new Schema(
+  {
+    price: Number,
+    coin: String,
+  },
+  { timestamps: true }
+);
 
-const cryptoPriceModel = ("price", cryptoPrice);
+const Modal = model("price", cryptoPrice);
 
-module.exports = cryptoPriceModel;
+module.exports = Modal;

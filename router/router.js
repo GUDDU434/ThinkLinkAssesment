@@ -3,7 +3,7 @@ const hbs = require("handlebars");
 const nodemailer = require("nodemailer");
 const router = Router();
 const axios = require("axios");
-const cryptoPriceModel = require("../modal/model");
+const Modal = require("../modal/model");
 require("dotenv/config");
 
 const HOST = process.env.HOST; //getting the url from the .env file
@@ -20,10 +20,10 @@ const transport = nodemailer.createTransport({
 });
 
 router.post("/prices/btc", async (request, response) => {
-  const { date, page, limit } = request.query;
-  const { max, min,email } = req.body;
+  const { date, offset, limit } = request.query;
+  const { max, min,email } = request.body;
   
-  console.log(date, offset, limit);
+  console.log(date, offset, limit,max, min,email);
   let curr_val;
 
   setInterval(() => {
@@ -31,10 +31,10 @@ router.post("/prices/btc", async (request, response) => {
       .get(
         `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${date}`
       )
-      .then(({ data }) => {
-        console.log(data);
+      .then(async({ data }) => {
+        // console.log(data);0
         curr_val = data.market_data.current_price.usd;
-        const price = new cryptoPriceModel({price:curr_val, coin:"btc"})
+        const price = new Modal({price:curr_val, coin:"btc"})
         await price.save()
 
       })
@@ -48,7 +48,7 @@ router.post("/prices/btc", async (request, response) => {
   </div>`;
   const template = hbs.compile(content);
 
-  if (curr_val > max) {
+  if (4000 > max) {
     transport.sendMail({
       from: "example.mailtrap.io",
       to: email,
@@ -64,12 +64,13 @@ router.post("/prices/btc", async (request, response) => {
     });
   }
 
-  if(page==undefined){
-    page=1
+  if(offset==undefined){
+    offset=0
   }
 
-  let data = await cryptoPriceModel.find().skip((page-1)*100).limit(page*100)
+  let data = await Modal.find().skip(offset).limit(offset+limit)
   response.status(200).send(data)
 });
+
 
 module.exports = router;
