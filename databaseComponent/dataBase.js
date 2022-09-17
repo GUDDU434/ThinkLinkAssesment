@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
-require("dotenv/config");
-
-const urlLocaldatabase = process.env.LOCAL_DATABASE_URL; //getting the url from the .env file
 
 const connection = mongoose //connectin the server with the database
-  .connect(urlLocaldatabase, {
+  .connect("mongodb://localhost:27017/cryptoPriceTracker", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

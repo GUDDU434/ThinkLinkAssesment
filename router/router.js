@@ -12,7 +12,8 @@ const PASSWORD = process.env.PASSWORD;
 
 const transport = nodemailer.createTransport({
   host: HOST,
-  port: 2525,
+  port: 587,
+  secure: false,
   auth: {
     user: USER,
     pass: PASSWORD,
@@ -52,20 +53,20 @@ router.post("/prices/btc", async (request, response) => {
   </div>`;
     const template = hbs.compile(content);
     if (val > max) {
-      console.log(val, email);
+
       transport.sendMail({
-        from: "aliguddu63@gmail.com",
+        from: process.env.FROM,
         to: email,
         subject: "Bitcoin price update",
-        html: template({ Email: email, up_down: "Up", diff: val - max }),
+        html: template({ Email: email, up_down: "Up", diff: val - max, current:val }),
       });
     } else if (val < min) {
-      // console.log(val, min);
+
       transport.sendMail({
-        from: "aliguddu63@gmail.com",
+        from: process.env.FROM,
         to: email,
         subject: "Bitcoin price update",
-        html: template({ Email: email, up_down: "down", diff: min - val }),
+        html: template({ Email: email, up_down: "down", diff: min - val, current:val }),
       });
     }
   };
@@ -74,10 +75,12 @@ router.post("/prices/btc", async (request, response) => {
     page = 1;
   }
 
+  let count = await Modal.find({ email }).length; 
+
   let data = await Modal.find({ email })
     .skip((page - 1) * limit)
     .limit(page * limit);
-  response.status(200).send({ data, count: data.length });
+  response.status(200).send({ data, count });
 });
 
 module.exports = router;
