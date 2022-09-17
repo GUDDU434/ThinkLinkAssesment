@@ -1,6 +1,6 @@
 # ThinkLinkAssesment
 ## Bitcoin price tracker:
-.env file contain:
+Addd.env file contain:
 <br/>
 mailinformation & database information
 <br/>
