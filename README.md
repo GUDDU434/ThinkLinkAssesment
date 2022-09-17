@@ -1,21 +1,21 @@
 # ThinkLinkAssesment
 ## Bitcoin price tracker:
 Addd.env file contain:
-<br/>
+
 mailinformation & database information
-<br/>
+
 FROM = (Organization email id)
-   <br/>
+   
 HOST = (name of the host)
-   <br/>
+   
 USER=  (user id)
-   <br/>
+  
 PASSWORD= (password)
-   <br/>
+   
 max= (maximum limit)
-   <br/>
+   
 min= (minimum limit)
-   <br/>
+   
 email= (email)
 
 ## How To start in local inviroment:
