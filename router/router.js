@@ -12,22 +12,19 @@ const PASSWORD = process.env.PASSWORD;
 
 const transport = nodemailer.createTransport({
   host: HOST,
-  port: 587,
-  secure: false,
+  port: 2525,
   auth: {
     user: USER,
     pass: PASSWORD,
   },
 });
 
-router.post("/prices/btc", async (request, response) => {
+router.get("/prices/btc", async (request, response) => {
   let { date, page, limit } = request.query;
-  const { max, min, email } = request.body;
+  const { max, min, email } = process.env;
 
   let fetchdata;
-
   clearInterval(fetchdata);
-
   fetchdata = setInterval(() => {
     axios
       .get(
@@ -35,14 +32,18 @@ router.post("/prices/btc", async (request, response) => {
       )
       .then(({ data }) => {
         let curr_val = data[0].current_price;
-        const price = new Modal({ price: curr_val, coin: "btc", email });
+        let D = new Date();
+        
+        let newDate = D.getDate()+"-"+D.getMonth()+"-"+D.getFullYear();
+
+        const price = new Modal({ price: curr_val, coin: "btc", email, date:newDate });
         price.save();
         sendreq(curr_val);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, 10 * 1000);
+  }, 30 * 1000);
 
   const sendreq = (val) => {
     console.log("functioncall");
@@ -75,12 +76,12 @@ router.post("/prices/btc", async (request, response) => {
     page = 1;
   }
 
-  let count = await Modal.find({ email }).length; 
+  let count = await Modal.find({ email ,date });
 
-  let data = await Modal.find({ email })
+  let data = await Modal.find({ email,date })
     .skip((page - 1) * limit)
     .limit(page * limit);
-  response.status(200).send({ data, count });
+  response.status(200).send({ data, count:count.length });
 });
 
 module.exports = router;
