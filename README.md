@@ -1,12 +1,16 @@
 # ThinkLinkAssesment
 ## Bitcoin price tracker:
 .env file contain:
-//mailinformation & database information
-FROM = <Organization email id>
-HOST = <name of the host>
-USER=  <user id>
-PASSWORD= <password>
-LOCAL_DATABASE_URL = "mongodb://localhost:27017/cryptoPriceTracker"
+<br/>
+mailinformation & database information
+<br/>
+FROM = (Organization email id)
+   <br/>
+HOST = (name of the host)
+   <br/>
+USER=  (user id)
+   <br/>
+PASSWORD= (password)
 
 ## How To start in local inviroment:
 1. clone the repogetory in your local enviroment
@@ -23,9 +27,9 @@ LOCAL_DATABASE_URL = "mongodb://localhost:27017/cryptoPriceTracker"
       min:18000
     }
 
-##Can also run through docker:
+## Can also run through docker:
 
-##Tech stack used:
+## Tech stack used:
 1. Nodejs v14.17.0
 2. Expressjs
 3. Nodemailer 
